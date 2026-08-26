@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Enterprise Banking Portal - Administrative Dashboard</title>
+    <style>
+        :root {
+            --primary-blue: #0A2540;
+            --accent-blue: #635BFF;
+            --bg-light: #F8F9FA;
+            --text-dark: #1A1F36;
+            --text-muted: #697386;
+            --success-green: #00875A;
+            --border-color: #E3E8EE;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background-color: var(--bg-light);
+            color: var(--text-dark);
+            margin: 0;
+            padding: 0;
+        }
+
+        .navbar {
+            background-color: var(--primary-blue);
+            color: white;
+            padding: 15px 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.08);
+        }
+
+        .navbar-brand h1 { margin: 0; font-size: 20px; font-weight: 600; }
+        
+        .nav-btn {
+            background-color: #1A1F36;
+            border: 1px solid var(--border-color);
+            color: white;
+            padding: 8px 16px;
+            text-decoration: none;
+            border-radius: 4px;
+            font-size: 13px;
+            font-weight: 600;
+        }
+        .nav-btn:hover { background-color: var(--accent-blue); }
+
+        .main-container { max-width: 600px; margin: 40px auto; padding: 0 20px; }
+        .card { background: white; border: 1px solid var(--border-color); border-radius: 8px; padding: 24px; box-shadow: 0 4px 6px rgba(0,0,0,0.02); }
+        .card-title { font-size: 16px; font-weight: 600; color: var(--primary-blue); margin-bottom: 20px; border-bottom: 2px solid var(--bg-light); padding-bottom: 12px; }
+        .form-group { margin-bottom: 16px; }
+        label { display: block; margin-bottom: 6px; font-size: 13px; font-weight: 500; }
+        input { width: 100%; border: 1px solid #D9E1E8; border-radius: 4px; padding: 10px 12px; font-size: 14px; box-sizing: border-box; }
+        input:focus { outline: none; border-color: var(--accent-blue); }
+        button { background-color: var(--accent-blue); color: white; border: none; border-radius: 4px; padding: 12px; font-size: 14px; font-weight: 600; cursor: pointer; width: 100%; }
+        button:hover { background-color: #544DC9; }
+        .status-box { background-color: var(--bg-light); border-left: 4px solid var(--text-muted); padding: 12px; margin-top: 15px; border-radius: 0 4px 4px 0; font-size: 13px; color: var(--text-muted); }
+        .status-success { background-color: #E6F4EA; border-left-color: var(--success-green); color: #137333; }
+        .status-error { background-color: #FCE8E6; border-left-color: #C5221F; color: #C5221F; }
+    </style>
+</head>
+<body>
+
+    <div class="navbar">
+        <div class="navbar-brand">
+            <h1>🏛️ Enterprise Core Banking Suite</h1>
+        </div>
+        <div>
+            <!-- BRIDGE LINK TO SECOND MANAGEMENT PAGE -->
+            <a href="ledger.html" class="nav-btn">Open Central Registry ➔</a>
+        </div>
+    </div>
+
+    <div class="main-container">
+        <div class="card">
+            <div class="card-title">Customer Onboarding Form</div>
+            <div class="form-group">
+                <label>Unique Account ID Number</label>
+                <input type="number" id="accId" placeholder="e.g., 1005">
+            </div>
+            <div class="form-group">
+                <label>Account Holder Legal Name</label>
+                <input type="text" id="accName" placeholder="e.g., Rajesh Kumar">
+            </div>
+            <div class="form-group">
+                <label>Initial Opening Balance (INR)</label>
+                <input type="number" id="accBalance" placeholder="Minimum requirement: ₹500">
+            </div>
+            <button onclick="createAccount()">Register New Account</button>
+            <div class="status-box" id="ingestConsole">System ready. Awaiting parameters...</div>
+        </div>
+    </div>
+
+<script>
+    const API_URL = "http://localhost:9090/api/accounts";
+
+    function createAccount() {
+        const consoleEl = document.getElementById('ingestConsole');
+        const id = document.getElementById('accId').value;
+        const name = document.getElementById('accName').value;
+        const balance = document.getElementById('accBalance').value;
+
+        if(!id || !name || !balance) {
+            consoleEl.className = "status-box status-error";
+            consoleEl.innerText = "Validation Exception: Fields cannot remain empty.";
+            return;
+        }
+
+        const payload = { id: parseInt(id), holderName: name, balance: parseFloat(balance) };
+        consoleEl.className = "status-box";
+        consoleEl.innerText = "Transmitting record to database layers...";
+
+        fetch(API_URL, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload)
+        })
+        .then(res => res.text())
+        .then(data => {
+            consoleEl.className = data.includes("❌") ? "status-box status-error" : "status-box status-success";
+            consoleEl.innerText = data;
+            if(!data.includes("❌")) {
+                document.getElementById('accId').value = '';
+                document.getElementById('accName').value = '';
+                document.getElementById('accBalance').value = '';
+            }
+        });
+    }
+</script>
+</body>
+</html>
