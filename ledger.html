@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Central Record Registry - Administration</title>
+    <style>
+        :root {
+            --primary-blue: #0A2540;
+            --accent-blue: #635BFF;
+            --bg-light: #F8F9FA;
+            --text-dark: #1A1F36;
+            --text-muted: #697386;
+            --success-green: #00875A;
+            --border-color: #E3E8EE;
+            --danger-red: #DE350B;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
+            background-color: var(--bg-light);
+            color: var(--text-dark);
+            margin: 0;
+            padding: 0;
+        }
+
+        .navbar {
+            background-color: var(--primary-blue);
+            color: white;
+            padding: 15px 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .navbar-brand h1 { margin: 0; font-size: 20px; font-weight: 600; }
+        
+        .nav-btn {
+            background-color: #1A1F36;
+            border: 1px solid var(--border-color);
+            color: white;
+            padding: 8px 16px;
+            text-decoration: none;
+            border-radius: 4px;
+            font-size: 13px;
+            font-weight: 600;
+        }
+        .nav-btn:hover { background-color: var(--accent-blue); }
+
+        .main-container { max-width: 1100px; margin: 40px auto; padding: 0 20px; }
+        .card { background: white; border: 1px solid var(--border-color); border-radius: 8px; padding: 24px; box-shadow: 0 4px 6px rgba(0,0,0,0.02); margin-bottom: 25px; }
+        .card-title { font-size: 16px; font-weight: 600; color: var(--primary-blue); margin-top: 0; margin-bottom: 20px; padding-bottom: 12px; border-bottom: 2px solid var(--bg-light); }
+        
+        .search-box { display: flex; gap: 15px; }
+        input { padding: 10px; border: 1px solid #D9E1E8; border-radius: 4px; font-size: 14px; }
+        .search-input { flex-grow: 1; }
+        
+        button { background-color: var(--accent-blue); color: white; border: none; border-radius: 4px; padding: 10px 20px; font-size: 14px; font-weight: 600; cursor: pointer; }
+        button:hover { background-color: #544DC9; }
+        .btn-danger { background-color: var(--danger-red); width: 100%; border-radius: 4px; padding: 8px; font-weight: 600; }
+        .btn-danger:hover { background-color: #BA250A; }
+        .btn-success { background-color: var(--success-green); width: 100%; margin-bottom: 15px; padding: 12px; }
+        .btn-success:hover { background-color: #006644; }
+
+        .status-box { background-color: var(--bg-light); border-left: 4px solid var(--text-muted); padding: 12px; margin-top: 15px; border-radius: 4px; font-size: 13px; }
+
+        table { width: 100%; border-collapse: collapse; text-align: left; }
+        th, td { padding: 14px 16px; border-bottom: 1px solid var(--border-color); font-size: 14px; }
+        th { background-color: var(--bg-light); color: var(--text-muted); font-size: 12px; text-transform: uppercase; }
+        tr:hover { background-color: #F8F9FA; }
+    </style>
+</head>
+<body>
+
+    <div class="navbar">
+        <div class="navbar-brand">
+            <h1>🏛️ Central Record Registry</h1>
+        </div>
+        <div>
+            <a href="index.html" class="nav-btn"> ❮ Back to Onboarding Form</a>
+        </div>
+    </div>
+
+    <div class="main-container">
+        
+        <!-- SEARCH ENGINE LAYOUT -->
+        <div class="card">
+            <div class="card-title">High-Speed Binary Search Index Lookup</div>
+            <div class="search-box">
+                <input type="number" id="searchId" class="search-input" placeholder="Enter registration Account ID key...">
+                <button onclick="searchAccount()">Execute Algorithm Query</button>
+            </div>
+            <div class="status-box" id="searchConsole">Ready for search compilation indexing...</div>
+        </div>
+
+        <!-- MAIN DATA MANAGEMENT SHEET -->
+        <div class="card">
+            <div class="card-title">Central Balance Ledger Sheet (Insertion-Sorted Balance)</div>
+            <button class="btn-success" onclick="fetchLedger()">Recalculate Matrix & Refresh Data Row States</button>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Account ID</th>
+                        <th>Account Holder Reference</th>
+                        <th>Asset Valuation</th>
+                        <th style="text-align: center; width: 150px;">Registry Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="ledgerBody"></tbody>
+            </table>
+        </div>
+
+    </div>
+
+<script>
+    const API_URL = "http://localhost:9090/api/accounts";
+
+    function fetchLedger() {
+        fetch(`${API_URL}/sorted`)
+        .then(res => res.json())
+        .then(data => {
+            let html = "";
+            data.forEach(acc => {
+                const formattedBalance = acc.balance.toLocaleString('en-IN', { style: 'currency', currency: 'INR' });
+                html += `<tr>
+                    <td><strong>${acc.id}</strong></td>
+                    <td>${acc.holderName}</td>
+                    <td style="color: var(--success-green); font-weight: 600;">${formattedBalance}</td>
+                    <td style="text-align: center;">
+                        <button class="btn-danger" onclick="deleteAccountRow(${acc.id})">🗑️ Delete Account</button>
+                    </td>
+                </tr>`;
+            });
+            document.getElementById('ledgerBody').innerHTML = html;
+        });
+    }
+
+    function searchAccount() {
+        const consoleEl = document.getElementById('searchConsole');
+        const id = document.getElementById('searchId').value;
+        if(!id) return;
+
+        fetch(`${API_URL}/${id}`)
+        .then(res => res.status === 404 ? null : res.json())
+        .then(data => {
+            if(data) {
+                const formattedAmt = data.balance.toLocaleString('en-IN', { style: 'currency', currency: 'INR' });
+                consoleEl.innerHTML = `<span style="color:var(--success-green)"><strong>✅ Match Located:</strong> Name: ${data.holderName} | Balance: ${formattedAmt}</span>`;
+            } else {
+                consoleEl.innerHTML = `<span style="color:var(--danger-red)">❌ Index Error: Account ID "${id}" does not exist in schema nodes.</span>`;
+            }
+        });
+    }
+
+    function deleteAccountRow(id) {
+        if (!confirm(`Are you absolutely sure you want to permanently Delete Account ID [${id}] from core database sheets?`)) return;
+
+        fetch(`${API_URL}/${id}`, { method: 'DELETE' })
+        .then(res => res.text())
+        .then(data => {
+            alert(data);
+            fetchLedger();
+        });
+    }
+
+    window.onload = fetchLedger;
+</script>
+</body>
+</html>
