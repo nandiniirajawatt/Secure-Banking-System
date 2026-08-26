@@ -96,20 +96,6 @@ class BankingController {
         return null;
     }
 
-    // NEW UPDATE ENDPOINT
-    @PutMapping("/{id}")
-    public String updateBalance(@PathVariable int id, @RequestBody java.util.Map<String, Double> body) {
-        Account account = accountRepository.findById(id).orElse(null);
-        if (account != null) {
-            double newBalance = body.get("balance");
-            account.setBalance(newBalance);
-            accountRepository.save(account);
-            return "✅ Balance successfully updated to ₹" + newBalance;
-        }
-        return "❌ Error: Account not found!";
-    }
-
-    // NEW DELETE ENDPOINT
     @DeleteMapping("/{id}")
     public String deleteAccount(@PathVariable int id) {
         if (accountRepository.existsById(id)) {
