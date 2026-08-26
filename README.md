@@ -179,8 +179,8 @@ This provides object-relational mapping between Java entities and relational dat
 ### Clone the Repository
 
 ```bash
-git clone <your-repository-url>
-cd <project-directory>
+git clone https://github.com
+cd Secure-Banking-System
 ```
 
 ### Run the Spring Boot Application
