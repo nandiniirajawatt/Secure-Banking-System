@@ -81,20 +81,45 @@ class BankingController {
     }
 
     @GetMapping("/{id}")
-    public Account searchAccountById(@PathVariable int id) {
-        List<Account> list = accountRepository.findAll(); 
-        Account[] arr = list.toArray(new Account[0]);
-        
-        // Custom DSA: Binary Search
-        int low = 0, high = arr.length - 1;
-        while (low <= high) {
-            int mid = low + (high - low) / 2;
-            if (arr[mid].getId() == id) return arr[mid];
-            if (arr[mid].getId() < id) low = mid + 1;
-            else high = mid - 1;
+public Account searchAccountById(@PathVariable int id) {
+
+    List<Account> list = accountRepository.findAll();
+    Account[] arr = list.toArray(new Account[0]);
+
+    //  Insertion Sort: Sort accounts by ID in ascending order
+    for (int i = 1; i < arr.length; i++) {
+        Account key = arr[i];
+        int j = i - 1;
+
+        while (j >= 0 && arr[j].getId() > key.getId()) {
+            arr[j + 1] = arr[j];
+            j--;
         }
-        return null;
+
+        arr[j + 1] = key;
     }
+
+    // Binary Search on ID-sorted array
+    int low = 0;
+    int high = arr.length - 1;
+
+    while (low <= high) {
+
+        int mid = low + (high - low) / 2;
+
+        if (arr[mid].getId() == id) {
+            return arr[mid];
+        }
+
+        if (arr[mid].getId() < id) {
+            low = mid + 1;
+        } else {
+            high = mid - 1;
+        }
+    }
+
+    return null;
+}
 
     @DeleteMapping("/{id}")
     public String deleteAccount(@PathVariable int id) {
