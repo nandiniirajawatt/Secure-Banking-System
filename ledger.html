@@ -114,41 +114,90 @@
     const API_URL = "http://localhost:9090/api/accounts";
 
     function fetchLedger() {
-        fetch(`${API_URL}/sorted`)
-        .then(res => res.json())
-        .then(data => {
-            let html = "";
-            data.forEach(acc => {
-                const formattedBalance = acc.balance.toLocaleString('en-IN', { style: 'currency', currency: 'INR' });
-                html += `<tr>
-                    <td><strong>${acc.id}</strong></td>
-                    <td>${acc.holderName}</td>
-                    <td style="color: var(--success-green); font-weight: 600;">${formattedBalance}</td>
-                    <td style="text-align: center;">
-                        <button class="btn-danger" onclick="deleteAccountRow(${acc.id})">🗑️ Delete Account</button>
-                    </td>
-                </tr>`;
+    fetch(`${API_URL}/sorted`)
+    .then(res => res.json())
+    .then(data => {
+
+        const ledgerBody = document.getElementById('ledgerBody');
+        ledgerBody.innerHTML = "";
+
+        data.forEach(acc => {
+
+            const formattedBalance = acc.balance.toLocaleString(
+                'en-IN',
+                { style: 'currency', currency: 'INR' }
+            );
+
+            const row = document.createElement('tr');
+
+            const idCell = document.createElement('td');
+            const idStrong = document.createElement('strong');
+            idStrong.textContent = acc.id;
+            idCell.appendChild(idStrong);
+
+            const nameCell = document.createElement('td');
+            nameCell.textContent = acc.holderName;
+
+            const balanceCell = document.createElement('td');
+            balanceCell.style.color = 'var(--success-green)';
+            balanceCell.style.fontWeight = '600';
+            balanceCell.textContent = formattedBalance;
+
+            const actionCell = document.createElement('td');
+            actionCell.style.textAlign = 'center';
+
+            const deleteButton = document.createElement('button');
+            deleteButton.className = 'btn-danger';
+            deleteButton.textContent = '🗑️ Delete Account';
+            deleteButton.addEventListener('click', () => {
+                deleteAccountRow(acc.id);
             });
-            document.getElementById('ledgerBody').innerHTML = html;
+
+            actionCell.appendChild(deleteButton);
+
+            row.appendChild(idCell);
+            row.appendChild(nameCell);
+            row.appendChild(balanceCell);
+            row.appendChild(actionCell);
+
+            ledgerBody.appendChild(row);
         });
-    }
+    });
+}
 
     function searchAccount() {
-        const consoleEl = document.getElementById('searchConsole');
-        const id = document.getElementById('searchId').value;
-        if(!id) return;
+    const consoleEl = document.getElementById('searchConsole');
+    const id = document.getElementById('searchId').value;
 
-        fetch(`${API_URL}/${id}`)
-        .then(res => res.status === 404 ? null : res.json())
-        .then(data => {
-            if(data) {
-                const formattedAmt = data.balance.toLocaleString('en-IN', { style: 'currency', currency: 'INR' });
-                consoleEl.innerHTML = `<span style="color:var(--success-green)"><strong>✅ Match Located:</strong> Name: ${data.holderName} | Balance: ${formattedAmt}</span>`;
-            } else {
-                consoleEl.innerHTML = `<span style="color:var(--danger-red)">❌ Index Error: Account ID "${id}" does not exist in schema nodes.</span>`;
-            }
-        });
-    }
+    if (!id) return;
+
+    fetch(`${API_URL}/${id}`)
+    .then(res => res.status === 404 ? null : res.json())
+    .then(data => {
+
+        consoleEl.replaceChildren();
+
+        const message = document.createElement('span');
+
+        if (data) {
+            const formattedAmt = data.balance.toLocaleString(
+                'en-IN',
+                { style: 'currency', currency: 'INR' }
+            );
+
+            message.style.color = 'var(--success-green)';
+            message.textContent =
+                `✅ Match Located: Name: ${data.holderName} | Balance: ${formattedAmt}`;
+
+        } else {
+            message.style.color = 'var(--danger-red)';
+            message.textContent =
+                `❌ Index Error: Account ID "${id}" does not exist.`;
+        }
+
+        consoleEl.appendChild(message);
+    });
+}
 
     function deleteAccountRow(id) {
         if (!confirm(`Are you absolutely sure you want to permanently Delete Account ID [${id}] from core database sheets?`)) return;
