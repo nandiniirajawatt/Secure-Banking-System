@@ -113,20 +113,29 @@
         consoleEl.innerText = "Transmitting record to database layers...";
 
         fetch(API_URL, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(payload)
-        })
-        .then(res => res.text())
-        .then(data => {
-            consoleEl.className = data.includes("❌") ? "status-box status-error" : "status-box status-success";
-            consoleEl.innerText = data;
-            if(!data.includes("❌")) {
-                document.getElementById('accId').value = '';
-                document.getElementById('accName').value = '';
-                document.getElementById('accBalance').value = '';
-            }
-        });
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(payload)
+})
+.then(res => res.text())
+.then(data => {
+    consoleEl.className = data.includes("❌")
+        ? "status-box status-error"
+        : "status-box status-success";
+
+    consoleEl.innerText = data;
+
+    if (!data.includes("❌")) {
+        document.getElementById('accId').value = '';
+        document.getElementById('accName').value = '';
+        document.getElementById('accBalance').value = '';
+    }
+})
+.catch(error => {
+    consoleEl.className = "status-box status-error";
+    consoleEl.innerText = "Unable to connect to the banking server. Please try again.";
+    console.error("API Error:", error);
+});
     }
 </script>
 </body>
