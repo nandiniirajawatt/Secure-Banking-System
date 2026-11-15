@@ -88,6 +88,7 @@ Highest → Lowest Balance
       ↓
 Ledger Display
 ```
+Insertion Sort is also used to sort account records by ID in ascending order before performing Binary Search.
 
 **Time Complexity:** O(n²) worst/average case
 **Space Complexity:** O(1) auxiliary space for in-place sorting
@@ -105,7 +106,7 @@ Sorted Account Records
           ↓
     Result / Not Found
 ```
-
+**Complete Search Operation**: O(n²) average and worst case, because the collection is sorted before Binary Search.
 **Time Complexity:** O(log n)
 **Space Complexity:** O(1) iterative implementation
 
