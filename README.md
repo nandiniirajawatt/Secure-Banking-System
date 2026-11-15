@@ -106,9 +106,9 @@ Sorted Account Records
           ↓
     Result / Not Found
 ```
-**Complete Search Operation**: O(n²) average and worst case, because the collection is sorted before Binary Search.
-**Time Complexity:** O(log n)
-**Space Complexity:** O(1) iterative implementation
+**Complete Search Operation Time Complexity:** O(n²)
+**Binary Search Algorithm Time Complexity:** O(log n)
+**Auxiliary Space Complexity:** O(1)
 
 > The collection must remain sorted according to the same key used by the search operation for Binary Search to be valid.
 
@@ -184,7 +184,7 @@ This provides object-relational mapping between Java entity objects and relation
 ### Clone the Repository
 
 ```bash
-git clone https://github.com
+git clone https://github.com/nandiniirajawatt/Secure-Banking-System.git
 cd Secure-Banking-System
 ```
 
