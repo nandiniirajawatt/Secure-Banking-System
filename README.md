@@ -2,7 +2,7 @@
 
 A full-stack banking administration system built with **Java, Spring Boot, JPA/Hibernate, H2, HTML5, CSS3, and Vanilla JavaScript**.
 
-The application simulates core banking-office workflows such as customer onboarding, account record management, asset-based ledger sorting, account searching, and record deletion through a structured multi-layer architecture.
+The application simulates core banking-office workflows such as customer onboarding, account record management, asset-based ledger sorting, account searching, and record deletion through a Spring Boot REST API integrated with a relational persistence layer.
 
 ## 🚀 Key Features
 
@@ -48,16 +48,20 @@ The application simulates core banking-office workflows such as customer onboard
                │ Fetch API
                ▼
 ┌─────────────────────────────┐
-│       Spring Boot API       │
-│ Controllers → Services      │
-│ → Business Logic            │
+│       Banking Controller    │
+│       REST API Endpoints    │
 └──────────────┬──────────────┘
                │
                ▼
 ┌─────────────────────────────┐
-│    Persistence Layer        │
-│ Spring Data JPA + Hibernate │
+│     Account Repository      │
+│       JpaRepository         │
 └──────────────┬──────────────┘
+               │
+               ▼
+┌─────────────────────────────┐
+│    Hibernate ORM / JPA      │
+└─────────────────────────────┘
                │
                ▼
 ┌─────────────────────────────┐
@@ -131,7 +135,7 @@ Initial Balance < ₹500
 
 This prevents invalid account records from reaching the database.
 
-## 🔄 CRUD Operations
+## 🔄 Account Management API Operations
 
 The backend exposes operations for managing account records:
 
@@ -166,7 +170,7 @@ The project uses:
 
 **Spring Data JPA → Hibernate → H2 Database**
 
-This provides object-relational mapping between Java entities and relational database tables while keeping persistence logic separated from the application's business layer.
+This provides object-relational mapping between Java entity objects and relational database tables. The AccountRepository interface uses JpaRepository to perform database operations, while Hibernate handles ORM implementation and H2 provides relational data storage.
 
 ## ▶️ Running the Project
 
