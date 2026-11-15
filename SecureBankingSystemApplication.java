@@ -5,6 +5,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.http.ResponseEntity;
 import jakarta.persistence.*;
 import java.util.List;
 
@@ -76,17 +77,20 @@ class BankingController {
         if(newAccount.getBalance() < 500) {
             return "❌ Error: Minimum initial deposit must be at least ₹500!";
         }
+        if (accountRepository.existsById(newAccount.getId())) {
+    return "❌ Error: Account ID already exists!";
+        }
         accountRepository.save(newAccount);
         return "✅ Account successfully initialized for " + newAccount.getHolderName();
     }
 
     @GetMapping("/{id}")
-public Account searchAccountById(@PathVariable int id) {
+public ResponseEntity<Account> searchAccountById(@PathVariable int id) {
 
     List<Account> list = accountRepository.findAll();
     Account[] arr = list.toArray(new Account[0]);
 
-    //  Insertion Sort: Sort accounts by ID in ascending order
+    // Insertion Sort: Sort accounts by ID in ascending order
     for (int i = 1; i < arr.length; i++) {
         Account key = arr[i];
         int j = i - 1;
@@ -108,7 +112,7 @@ public Account searchAccountById(@PathVariable int id) {
         int mid = low + (high - low) / 2;
 
         if (arr[mid].getId() == id) {
-            return arr[mid];
+            return ResponseEntity.ok(arr[mid]);
         }
 
         if (arr[mid].getId() < id) {
@@ -118,7 +122,8 @@ public Account searchAccountById(@PathVariable int id) {
         }
     }
 
-    return null;
+    //HTTP 404 if account is not found
+    return ResponseEntity.notFound().build();
 }
 
     @DeleteMapping("/{id}")
